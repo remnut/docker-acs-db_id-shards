@@ -1,0 +1,361 @@
+# This docker-compose file will spin up an ACS cluster on a local host or on a server and it requires a minimum of 16GB Memory to distribute among containers.
+# Limit container memory and assign X percentage to JVM.  There are couple of ways to allocate JVM Memory for ACS Containers
+# For example: 'JAVA_OPTS: "$JAVA_OPTS -XX:+PrintFlagsFinal -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"'
+# But, as per Oracle docs (https://docs.oracle.com/javase/9/gctuning/parallel-collector1.htm#JSGCT-GUID-CAB83393-3438-44ED-98F0-D15641B43C7D)
+# If container memory is not explicitly set, then the above flags will default max heap to 1/4th of container's memory which may not be ideal. 
+# Hence, setting up explicit Container memory and then assigning a percentage of it to the JVM for performance tuning.
+
+# Using version 2 as 3 does not support resource constraint options (cpu_*, mem_* limits) for non swarm mode in Compose  
+version: "2"
+
+# author: Mark Tunmer
+# version: 1.0
+
+services:
+    alfresco1:
+        image: alfresco/alfresco-content-repository:6.1.0
+        mem_limit: 1500m 
+        environment:
+            JAVA_OPTS: "
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.useDynamicShardRegistration=true
+                -Dmessaging.subsystem.autoStart=false
+                -Dtransform.service.enabled=false
+                -Dlocal.transform.service.enabled=false
+                -Dlegacy.transform.service.enabled=false
+                -Dsolr.port=8983
+                -Dsolr.secureComms=none
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
+                -Djodconverter.url=http://libreoffice:8090/
+                -Dimg.url=http://imagemagick:8090/
+                -Dshare.host=localhost
+                -Ddeployment.method=DOCKER_COMPOSE
+                -Dcsrf.filter.enabled=false
+                -Xms1g -Xmx1g
+                "
+        ports:
+            - 8081:8080 #Browser port
+        volumes:
+            - ./data/services/content/alf_data/:/usr/local/tomcat/alf_data/
+            # - ./data/services/content/logs/:/usr/local/tomcat/logs/
+            # - ./data/services/content/alfresco-global.properties:/usr/local/tomcat/shared/classes/alfresco-global.properties
+            # - ./data/services/content/custom/:/usr/local/tomcat/custom/
+
+    share1:
+        image:  alfresco/alfresco-share:6.1.0
+        mem_limit: 1g
+        environment:
+            - REPO_HOST=alfresco1
+            - REPO_PORT=8080
+            - "CATALINA_OPTS= -Xms500m -Xmx500m"
+        ports:
+            - 8080:8080
+
+    alfresco2:
+        image: alfresco/alfresco-content-repository:6.1.0
+        mem_limit: 1500m 
+        environment:
+            JAVA_OPTS: "
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.useDynamicShardRegistration=true
+                -Dmessaging.subsystem.autoStart=false
+                -Dtransform.service.enabled=false
+                -Dlocal.transform.service.enabled=false
+                -Dlegacy.transform.service.enabled=false
+                -Dsolr.port=8983
+                -Dsolr.secureComms=none
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
+                -Djodconverter.url=http://libreoffice:8090/
+                -Dimg.url=http://imagemagick:8090/
+                -Dshare.host=localhost
+                -Ddeployment.method=DOCKER_COMPOSE
+                -Dcsrf.filter.enabled=false
+                -Xms1g -Xmx1g
+                "
+        ports:
+            - 9091:8080 #Browser port
+        volumes:
+            - ./data/services/content/alf_data/:/usr/local/tomcat/alf_data/
+
+    share2:
+        image:  alfresco/alfresco-share:6.1.0
+        mem_limit: 1g
+        environment:
+            - REPO_HOST=alfresco2
+            - REPO_PORT=8080
+            - "CATALINA_OPTS= -Xms500m -Xmx500m"
+        ports:
+            - 9090:8080
+
+    trackerS0:
+        image: alfresco/alfresco-content-repository:6.1.0
+        mem_limit: 1500m 
+        environment:
+            JAVA_OPTS: "
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.useDynamicShardRegistration=true
+                -Dsolr.host=solr6s0
+                -Dmessaging.subsystem.autoStart=false
+                -Dtransform.service.enabled=false
+                -Dlocal.transform.service.enabled=false
+                -Dlegacy.transform.service.enabled=false
+                -Dsolr.port=8983
+                -Dsolr.secureComms=none
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
+                -Djodconverter.url=http://libreoffice:8090/
+                -Dimg.url=http://imagemagick:8090/
+                -Dshare.host=localhost
+                -Ddeployment.method=DOCKER_COMPOSE
+                -Dcsrf.filter.enabled=false
+                -Xms1g -Xmx1g
+                "
+        ports:
+            - 8060:8080 #Browser port
+        volumes:
+            - ./data/services/content/alf_data/:/usr/local/tomcat/alf_data
+
+    solr6s0:
+        image: alfresco/alfresco-search-services:1.3.0.7
+        mem_limit: 1g
+        environment:
+            #solr needs to know how to register itself with Alfresco
+            - SOLR_ALFRESCO_HOST=trackerS0
+            - ALFRESCO_SECURE_COMMS=none
+            - SOLR_ALFRESCO_PORT=8080
+            - SOLR_HOSTNAME=solr6s0
+            #Alfresco needs to know how to call solr
+            - SOLR_SOLR_HOST=solr6s0
+            - SOLR_SOLR_PORT=8983
+            #Create the default alfresco and archive cores
+            #- SOLR_CREATE_ALFRESCO_DEFAULTS=alfresco,archive
+            - "SOLR_JAVA_MEM=-Xms1g -Xmx1g"
+        ports:
+            - 9000:8983 #Browser port
+        volumes:
+            - ./data/services/search/shard0/logs:/opt/alfresco-search-services/logs
+            - ./data/services/search/shard0/solrhome/rerank:/opt/alfresco-search-services/solrhome/rerank--workspace-SpacesStore--shards--4-x-1--node--1-of-1
+            - ./data/services/search/shard0/data:/opt/alfresco-search-services/data
+            - ./data/services/search/shard0/contentstore:/opt/alfresco-search-services/contentstore
+            - ./data/services/search/shard0/solrhome/index:/opt/alfresco-search-services/solrhome/index
+
+    trackerS1:
+        image: alfresco/alfresco-content-repository:6.1.0
+        mem_limit: 1500m 
+        environment:
+            JAVA_OPTS: "
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.useDynamicShardRegistration=true
+                -Dsolr.host=solr6s1
+                -Dmessaging.subsystem.autoStart=false
+                -Dtransform.service.enabled=false
+                -Dlocal.transform.service.enabled=false
+                -Dlegacy.transform.service.enabled=false
+                -Dsolr.port=8983
+                -Dsolr.secureComms=none
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
+                -Djodconverter.url=http://libreoffice:8090/
+                -Dimg.url=http://imagemagick:8090/
+                -Dshare.host=localhost
+                -Ddeployment.method=DOCKER_COMPOSE
+                -Dcsrf.filter.enabled=false
+                -Xms1g -Xmx1g
+                "
+        ports:
+            - 8061:8080 #Browser port
+        volumes:
+            - ./data/services/content/alf_data/:/usr/local/tomcat/alf_data
+
+    solr6s1:
+        image: alfresco/alfresco-search-services:1.3.0.7
+        mem_limit: 1g
+        environment:
+            #solr needs to know how to register itself with Alfresco
+            - SOLR_ALFRESCO_HOST=trackerS1
+            - ALFRESCO_SECURE_COMMS=none
+            - SOLR_ALFRESCO_PORT=8080
+            - SOLR_HOSTNAME=solr6s1
+            #Alfresco needs to know how to call solr
+            - SOLR_SOLR_HOST=solr6s1
+            - SOLR_SOLR_PORT=8983
+            #Create the default alfresco and archive cores
+            #- SOLR_CREATE_ALFRESCO_DEFAULTS=alfresco,archive
+            - "SOLR_JAVA_MEM=-Xms1g -Xmx1g"
+        ports:
+            - 9001:8983
+        volumes:
+            - ./data/services/search/shard1/logs:/opt/alfresco-search-services/logs
+            - ./data/services/search/shard1/solrhome/rerank:/opt/alfresco-search-services/solrhome/rerank--workspace-SpacesStore--shards--4-x-1--node--1-of-1
+            - ./data/services/search/shard1/data:/opt/alfresco-search-services/data
+            - ./data/services/search/shard1/contentstore:/opt/alfresco-search-services/contentstore
+            - ./data/services/search/shard1/solrhome/index:/opt/alfresco-search-services/solrhome/index
+
+    trackerS2:
+        image: alfresco/alfresco-content-repository:6.1.0
+        mem_limit: 1500m 
+        environment:
+            JAVA_OPTS: "
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.useDynamicShardRegistration=true
+                -Dsolr.host=solr6s2
+                -Dmessaging.subsystem.autoStart=false
+                -Dtransform.service.enabled=false
+                -Dlocal.transform.service.enabled=false
+                -Dlegacy.transform.service.enabled=false
+                -Dsolr.port=8983
+                -Dsolr.secureComms=none
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
+                -Djodconverter.url=http://libreoffice:8090/
+                -Dimg.url=http://imagemagick:8090/
+                -Dshare.host=localhost
+                -Ddeployment.method=DOCKER_COMPOSE
+                -Dcsrf.filter.enabled=false
+                -Xms1g -Xmx1g
+                "
+        ports:
+            - 8062:8080 #Browser port
+        volumes:
+            - ./data/services/content/alf_data/:/usr/local/tomcat/alf_data
+
+    solr6s2:
+        image: alfresco/alfresco-search-services:1.3.0.7
+        mem_limit: 1g
+        environment:
+            #solr needs to know how to register itself with Alfresco
+            - SOLR_ALFRESCO_HOST=trackerS2
+            - ALFRESCO_SECURE_COMMS=none
+            - SOLR_ALFRESCO_PORT=8080
+            - SOLR_HOSTNAME=solr6s2
+            #Alfresco needs to know how to call solr
+            - SOLR_SOLR_HOST=solr6s2
+            - SOLR_SOLR_PORT=8983
+            #Create the default alfresco and archive cores
+            #- SOLR_CREATE_ALFRESCO_DEFAULTS=alfresco,archive
+            - "SOLR_JAVA_MEM=-Xms1g -Xmx1g"
+        ports:
+            - 9002:8983
+        volumes:
+            - ./data/services/search/shard2/logs:/opt/alfresco-search-services/logs
+            - ./data/services/search/shard2/solrhome/rerank:/opt/alfresco-search-services/solrhome/rerank--workspace-SpacesStore--shards--4-x-1--node--1-of-1
+            - ./data/services/search/shard2/data:/opt/alfresco-search-services/data
+            - ./data/services/search/shard2/contentstore:/opt/alfresco-search-services/contentstore
+            - ./data/services/search/shard2/solrhome/index:/opt/alfresco-search-services/solrhome/index
+
+    trackerS3:
+        image: alfresco/alfresco-content-repository:6.1.0
+        mem_limit: 1500m 
+        environment:
+            JAVA_OPTS: "
+                -Ddb.driver=org.postgresql.Driver
+                -Ddb.username=alfresco
+                -Ddb.password=alfresco
+                -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+                -Dsolr.useDynamicShardRegistration=true
+                -Dsolr.host=solr6s3
+                -Dmessaging.subsystem.autoStart=false
+                -Dtransform.service.enabled=false
+                -Dlocal.transform.service.enabled=false
+                -Dlegacy.transform.service.enabled=false
+                -Dsolr.port=8983
+                -Dsolr.secureComms=none
+                -Dsolr.base.url=/solr
+                -Dindex.subsystem.name=solr6
+                -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
+                -Djodconverter.url=http://libreoffice:8090/
+                -Dimg.url=http://imagemagick:8090/
+                -Dshare.host=localhost
+                -Ddeployment.method=DOCKER_COMPOSE
+                -Dcsrf.filter.enabled=false
+                -Xms1g -Xmx1g
+                "
+        ports:
+            - 8063:8080 #Browser port
+        volumes:
+            - ./data/services/content/alf_data/:/usr/local/tomcat/alf_data
+
+    solr6s3:
+        image: alfresco/alfresco-search-services:1.3.0.7
+        mem_limit: 1g
+        environment:
+            #solr needs to know how to register itself with Alfresco
+            - SOLR_ALFRESCO_HOST=trackerS3
+            - ALFRESCO_SECURE_COMMS=none
+            - SOLR_ALFRESCO_PORT=8080
+            - SOLR_HOSTNAME=solr6s3
+            #Alfresco needs to know how to call solr
+            - SOLR_SOLR_HOST=solr6s3
+            - SOLR_SOLR_PORT=8983
+            #Create the default alfresco and archive cores
+            #- SOLR_CREATE_ALFRESCO_DEFAULTS=alfresco,archive
+            - "SOLR_JAVA_MEM=-Xms1g -Xmx1g"
+        ports:
+            - 9003:8983
+        volumes:
+            - ./data/services/search/shard3/logs:/opt/alfresco-search-services/logs
+            - ./data/services/search/shard3/solrhome/rerank:/opt/alfresco-search-services/solrhome/rerank--workspace-SpacesStore--shards--4-x-1--node--1-of-1
+            - ./data/services/search/shard3/data:/opt/alfresco-search-services/data
+            - ./data/services/search/shard3/contentstore:/opt/alfresco-search-services/contentstore
+            - ./data/services/search/shard3/solrhome/index:/opt/alfresco-search-services/solrhome/index
+
+
+    alfresco-pdf-renderer:
+        image: alfresco/alfresco-pdf-renderer:1.3
+        mem_limit: 1g
+        environment:
+            JAVA_OPTS: " -Xms256m -Xmx256m"
+        ports:
+            - 8090:8090
+
+    imagemagick:
+        image: alfresco/alfresco-imagemagick:1.3
+        mem_limit: 1g
+        environment:
+            JAVA_OPTS: " -Xms256m -Xmx256m"
+        ports:
+            - 8091:8090
+
+    libreoffice:
+        image: alfresco/alfresco-libreoffice:1.3
+        mem_limit: 1g
+        environment:
+            JAVA_OPTS: " -Xms256m -Xmx256m"
+        ports:
+            - 8092:8090
+    
+    postgres:
+        image: postgres:10.1
+        mem_limit: 3000m
+        environment:
+            - POSTGRES_PASSWORD=alfresco
+            - POSTGRES_USER=alfresco
+            - POSTGRES_DB=alfresco
+        command: postgres -c max_connections=500 -c log_min_messages=LOG
+        ports:
+            - 5432:5432
+        volumes:
+            # - ./data/:/data
+            - ./data/services/postgres/data/:/var/lib/postgresql/data/

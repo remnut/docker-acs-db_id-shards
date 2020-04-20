@@ -1,0 +1,279 @@
+{
+	"info": {
+		"_postman_id": "7000658e-6b3b-4bc2-bfd3-3278be18a3f5",
+		"name": "acs-dbid-shards",
+		"description": "curl requests to create shards",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "shard-0",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9000/solr/admin/cores?action=newCore&storeRef=workspace://SpacesStore&numShards=4&numNodes=1&nodeInstance=1&template=rerank&shard.method=DB_ID&property.data.dir.root=/opt/alfresco-search-services/solrhome/index&shardIds=0&property.alfresco.secureComms=none&property.solr.suggester.enabled=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"solr",
+						"admin",
+						"cores"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "newCore"
+						},
+						{
+							"key": "storeRef",
+							"value": "workspace://SpacesStore"
+						},
+						{
+							"key": "numShards",
+							"value": "4"
+						},
+						{
+							"key": "numNodes",
+							"value": "1"
+						},
+						{
+							"key": "nodeInstance",
+							"value": "1"
+						},
+						{
+							"key": "template",
+							"value": "rerank"
+						},
+						{
+							"key": "shard.method",
+							"value": "DB_ID"
+						},
+						{
+							"key": "property.data.dir.root",
+							"value": "/opt/alfresco-search-services/solrhome/index"
+						},
+						{
+							"key": "shardIds",
+							"value": "0"
+						},
+						{
+							"key": "property.alfresco.secureComms",
+							"value": "none"
+						},
+						{
+							"key": "property.solr.suggester.enabled",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "shard-1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9001/solr/admin/cores?action=newCore&storeRef=workspace://SpacesStore&numShards=4&numNodes=1&nodeInstance=1&template=rerank&shard.method=DB_ID&property.data.dir.root=/opt/alfresco-search-services/solrhome/index&shardIds=1&property.alfresco.secureComms=none&property.solr.suggester.enabled=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9001",
+					"path": [
+						"solr",
+						"admin",
+						"cores"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "newCore"
+						},
+						{
+							"key": "storeRef",
+							"value": "workspace://SpacesStore"
+						},
+						{
+							"key": "numShards",
+							"value": "4"
+						},
+						{
+							"key": "numNodes",
+							"value": "1"
+						},
+						{
+							"key": "nodeInstance",
+							"value": "1"
+						},
+						{
+							"key": "template",
+							"value": "rerank"
+						},
+						{
+							"key": "shard.method",
+							"value": "DB_ID"
+						},
+						{
+							"key": "property.data.dir.root",
+							"value": "/opt/alfresco-search-services/solrhome/index"
+						},
+						{
+							"key": "shardIds",
+							"value": "1"
+						},
+						{
+							"key": "property.alfresco.secureComms",
+							"value": "none"
+						},
+						{
+							"key": "property.solr.suggester.enabled",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "shard-2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9002/solr/admin/cores?action=newCore&storeRef=workspace://SpacesStore&numShards=4&numNodes=1&nodeInstance=1&template=rerank&shard.method=DB_ID&property.data.dir.root=/opt/alfresco-search-services/solrhome/index&shardIds=2&property.alfresco.secureComms=none&property.solr.suggester.enabled=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9002",
+					"path": [
+						"solr",
+						"admin",
+						"cores"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "newCore"
+						},
+						{
+							"key": "storeRef",
+							"value": "workspace://SpacesStore"
+						},
+						{
+							"key": "numShards",
+							"value": "4"
+						},
+						{
+							"key": "numNodes",
+							"value": "1"
+						},
+						{
+							"key": "nodeInstance",
+							"value": "1"
+						},
+						{
+							"key": "template",
+							"value": "rerank"
+						},
+						{
+							"key": "shard.method",
+							"value": "DB_ID"
+						},
+						{
+							"key": "property.data.dir.root",
+							"value": "/opt/alfresco-search-services/solrhome/index"
+						},
+						{
+							"key": "shardIds",
+							"value": "2"
+						},
+						{
+							"key": "property.alfresco.secureComms",
+							"value": "none"
+						},
+						{
+							"key": "property.solr.suggester.enabled",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "shard-3",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9003/solr/admin/cores?action=newCore&storeRef=workspace://SpacesStore&numShards=4&numNodes=1&nodeInstance=1&template=rerank&shard.method=DB_ID&property.data.dir.root=/opt/alfresco-search-services/solrhome/index&shardIds=3&property.alfresco.secureComms=none&property.solr.suggester.enabled=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9003",
+					"path": [
+						"solr",
+						"admin",
+						"cores"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "newCore"
+						},
+						{
+							"key": "storeRef",
+							"value": "workspace://SpacesStore"
+						},
+						{
+							"key": "numShards",
+							"value": "4"
+						},
+						{
+							"key": "numNodes",
+							"value": "1"
+						},
+						{
+							"key": "nodeInstance",
+							"value": "1"
+						},
+						{
+							"key": "template",
+							"value": "rerank"
+						},
+						{
+							"key": "shard.method",
+							"value": "DB_ID"
+						},
+						{
+							"key": "property.data.dir.root",
+							"value": "/opt/alfresco-search-services/solrhome/index"
+						},
+						{
+							"key": "shardIds",
+							"value": "3"
+						},
+						{
+							"key": "property.alfresco.secureComms",
+							"value": "none"
+						},
+						{
+							"key": "property.solr.suggester.enabled",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
