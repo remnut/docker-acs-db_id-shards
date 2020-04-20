@@ -20,13 +20,16 @@ It will start 16 containers including the following
 
 The processes all use their default ports within their containers, but they are exposed through docker as follows
 
-http://localhost:<port>/share
-http://localhost:<port>/alfresco
-http://localhost:<port>/solr
+http://localhost:<port\>/share
+http://localhost:<port\>/alfresco
+http://localhost:<port\>/solr
 
 Alfresco front end Ports: 8081 & 9091
+
 Share Ports: 8080 & 9090
+
 ACS tracker Ports: 8060, 8061, 8062, 8063
+
 Solr shard Ports: 9000, 9001, 9002, 9003
 
 Feel free to change them to whatever suits as long as they don't overlap
